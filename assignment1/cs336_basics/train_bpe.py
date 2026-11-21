@@ -111,3 +111,34 @@ def train_bpe(
         merges.append(best_pair)
 
     return vocab, merges
+
+if __name__ == "__main__":
+    import json
+    import resource
+    import sys
+    from pathlib import Path
+    from time import perf_counter
+
+    train_path = sys.argv[1]
+    special_tokens = ["<|endoftext|>"]
+
+    started_at = perf_counter()
+    print(f"Training BPE on {train_path}", flush=True)
+    vocab, merges = train_bpe(train_path, 10_000, special_tokens)
+    elapsed = perf_counter() - started_at
+    peak_mib = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+
+    # 你的词表和合并规则存的是 bytes，转成十六进制字符串就能写进 JSON。
+    saved = {
+        "vocab": {str(i): token.hex() for i, token in vocab.items()},
+        "merges": [[left.hex(), right.hex()] for left, right in merges],
+        "special_tokens": special_tokens,
+    }
+
+    output = Path("data/tinystories_bpe.json")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(saved), encoding="utf-8")
+
+    print(f"saved {output}, vocab_size={len(vocab)}")
+    print(f"training_seconds={elapsed:.2f}, peak_main_rss_mib={peak_mib:.1f}")
+    print(f"longest_token={max(vocab.values(), key=len)!r}")
