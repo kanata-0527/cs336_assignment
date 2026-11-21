@@ -1,0 +1,4 @@
+mode,eager_mean_ms,eager_std_ms,compiled_mean_ms,compiled_std_ms,speedup,eager_status,compiled_status
+forward,23.926,0.018,17.839,0.026,1.3412,ok,ok
+forward-backward,80.006,0.153,58.844,0.063,1.3596,ok,ok
+train,90.472,0.473,68.935,0.187,1.3124,ok,ok
