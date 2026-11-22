@@ -444,7 +444,7 @@ def scaled_dot_product_attention(
         attention_weights = softmax(attention_scores, dim=-1)
 
     with mark("attn_pv_matmul"):
-        return einsum(attention_weights, V, "... query key, ... key d_v -> ... query d_v")
+        return einsum(attention_weights.to(V.dtype), V, "... query key, ... key d_v -> ... query d_v")
 
 
 class CausalMultiHeadSelfAttention(nn.Module):
